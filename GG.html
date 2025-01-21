@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกม คณิต คิด หรรษา</title>
+    <style>
+        body {
+            background-color: #eb9bae;
+            font-family: 'Comic Sans MS', sans-serif;
+            text-align: center;
+        }
+        .game-container {
+            background-color: rgba(127, 209, 209, 0.8);
+            width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .question, .score, .timer {
+            font-size: 20px;
+            color: #cf007f;
+        }
+        .answer-entry {
+            font-size: 18px;
+            padding: 5px;
+            width: 100px;
+        }
+        .check-button {
+            font-size: 18px;
+            background-color: #ff5396;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .check-button:hover {
+            background-color: #d13a79;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <div class="question" id="question">คำถามจะมา</div>
+        <input type="text" id="answer" class="answer-entry" placeholder="คำตอบ">
+        <button class="check-button" onclick="checkAnswer()">ตรวจสอบ</button>
+        <div class="score" id="score">คะแนน: 0</div>
+        <div class="timer" id="timer">เวลา: 1 นาที 30 วินาที</div>
+    </div>
+
+    <script>
+        let score = 0;
+        let numQuestions = 0;
+        const totalQuestions = 10;
+        let timeLeft = 90;
+        let correctAnswer = 0;
+
+        function generateQuestion() {
+            let num1 = Math.floor(Math.random() * 20) + 1;
+            let num2 = Math.floor(Math.random() * 20) + 1;
+            const operations = ['+', '-', '*', '/'];
+            const operation = operations[Math.floor(Math.random() * operations.length)];
+            
+            if (operation === '/') {
+                while (num2 === 0) {
+                    num2 = Math.floor(Math.random() * 20) + 1;
+                }
+                num1 = num1 * num2; 
+                correctAnswer = (num1 / num2).toFixed(2);
+            } else if (operation === '+') {
+                correctAnswer = num1 + num2;
+            } else if (operation === '-') {
+                correctAnswer = num1 - num2;
+            } else if (operation === '*') {
+                correctAnswer = num1 * num2;
+            }
+
+            document.getElementById("question").textContent = `${num1} ${operation} ${num2} = ?`;
+        }
+
+        function checkAnswer() {
+            const userAnswer = parseFloat(document.getElementById("answer").value);
+            if (isNaN(userAnswer)) {
+                alert("โปรดป้อนตัวเลขเท่านั้น");
+                return;
+            }
+
+            if (Math.abs(userAnswer - correctAnswer) < 0.00001) {
+                score++;
+                alert("คำตอบถูกต้อง!");
+            } else {
+                alert(`คำตอบที่ถูกคือ ${correctAnswer}`);
+            }
+
+            numQuestions++;
+            document.getElementById("score").textContent = `คะแนน: ${score}`;
+
+            if (numQuestions >= totalQuestions) {
+                endGame();
+            } else {
+                generateQuestion();
+            }
+        }
+
+        function startTimer() {
+            if (timeLeft > 0) {
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+                document.getElementById("timer").textContent = `เวลา: ${minutes} นาที ${seconds} วินาที`;
+                timeLeft--;
+                setTimeout(startTimer, 1000);
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            let feedback = score >= 7 ? "เก่งมาก!" : "พยายามอีกครั้ง!";
+            alert(`จบเกม\nคะแนนของคุณคือ ${score}/${totalQuestions}\n${feedback}`);
+            location.reload();  // รีโหลดหน้าใหม่เพื่อเริ่มเกมใหม่
+        }
+
+        // เริ่มเกม
+        generateQuestion();
+        startTimer();
+    </script>
+
+</body>
+</html>
